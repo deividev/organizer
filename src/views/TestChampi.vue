@@ -13,7 +13,6 @@ import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import Circle from "ol/geom/Circle";
-import Point from "ol/geom/Point";
 import Feature from "ol/Feature";
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
@@ -64,24 +63,29 @@ export default {
       ];
       this.currentPosition = fromLonLat(positionLonLat);
       this.map.getView().setCenter(this.currentPosition);
-      const layer = new VectorLayer({
-        source: new VectorSource({
-          projection: "EPSG:4326",
-          features: [new Feature(new Circle(this.currentPosition, 1000))]
-        }),
-        style: [
-          new Style({
-            stroke: new Stroke({
-              color: "blue",
-              width: 1
-            }),
-            fill: new Fill({
-              color: "rgba(0, 0, 255, 0.9)"
+      if (!this.circle) {
+        this.circle = new Circle(this.currentPosition, 250);
+        const layer = new VectorLayer({
+          source: new VectorSource({
+            projection: "EPSG:4326",
+            features: [new Feature(this.circle)]
+          }),
+          style: [
+            new Style({
+              stroke: new Stroke({
+                color: "blue",
+                width: 1
+              }),
+              fill: new Fill({
+                color: "rgba(0, 0, 255, 0.9)"
+              })
             })
-          })
-        ]
-      });
-      this.map.addLayer(layer);
+          ]
+        });
+        this.map.addLayer(layer);
+        return;
+      }
+      this.circle.setCenter(this.currentPosition);
     },
     failurePosition: function(err) {
       alert("Error Code: " + err.code + " Error Message: " + err.message);
