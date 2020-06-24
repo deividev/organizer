@@ -1,10 +1,46 @@
 <template>
-  <div id="tracking">{{positions}}</div>
+  <div>
+    <div id="tracking">{{currentPosition}}</div>
+    <div id="map"></div>
+  </div>
 </template>
 <script>
+import "ol/ol.css";
+import { Map, View } from "ol";
+import TileLayer from "ol/layer/Tile";
+import OSM from "ol/source/OSM";
+import { fromLonLat } from "ol/proj";
+import { Vector as VectorLayer } from "ol/layer";
+import { Vector as VectorSource } from "ol/source";
+import Circle from "ol/geom/Circle";
+import Point from "ol/geom/Point";
+import Feature from "ol/Feature";
+import Style from "ol/style/Style";
+import Stroke from "ol/style/Stroke";
+import Fill from "ol/style/Fill";
+
 export default {
   components: {},
+  data: () => ({
+    zoom: 16,
+    currentPosition: [0, 0],
+    map: null
+  }),
   methods: {
+    initMap() {
+      this.map = new Map({
+        target: "map",
+        layers: [
+          new TileLayer({
+            source: new OSM()
+          })
+        ],
+        view: new View({
+          center: this.currentPosition,
+          zoom: 12
+        })
+      });
+    },
     trackPosition() {
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
@@ -19,30 +55,39 @@ export default {
       } else {
         alert(`Browser doesn't support Geolocation`);
       }
+      this.initMap();
     },
-    successPosition: function(position) {
-      this.positions.push({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
+    successPosition(position) {
+      const positionLonLat = [
+        position.coords.longitude,
+        position.coords.latitude
+      ];
+      this.currentPosition = fromLonLat(positionLonLat);
+      this.map.getView().setCenter(this.currentPosition);
+      const layer = new VectorLayer({
+        source: new VectorSource({
+          projection: "EPSG:4326",
+          features: [new Feature(new Circle(this.currentPosition, 1000))]
+        }),
+        style: [
+          new Style({
+            stroke: new Stroke({
+              color: "blue",
+              width: 1
+            }),
+            fill: new Fill({
+              color: "rgba(0, 0, 255, 0.9)"
+            })
+          })
+        ]
       });
-      this.centerPosition = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
+      this.map.addLayer(layer);
     },
     failurePosition: function(err) {
       alert("Error Code: " + err.code + " Error Message: " + err.message);
     }
   },
   computed: {},
-  data: () => ({
-    centerPosition: {
-      lat: 10.762622,
-      lng: 106.660172
-    },
-    zoom: 16,
-    positions: []
-  }),
   mounted() {
     this.trackPosition();
   }
@@ -51,5 +96,9 @@ export default {
 <style scoped lang="scss">
 #tracking {
   height: 100%;
+}
+#map {
+  width: 400px;
+  height: 250px;
 }
 </style>
