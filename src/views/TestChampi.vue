@@ -13,6 +13,8 @@ import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import Circle from "ol/geom/Circle";
+import Point from "ol/geom/Point";
+import LineString from "ol/geom/LineString";
 import Feature from "ol/Feature";
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
@@ -23,6 +25,7 @@ export default {
   data: () => ({
     zoom: 16,
     currentPosition: [0, 0],
+    startingPoint: null,
     map: null
   }),
   methods: {
@@ -62,9 +65,9 @@ export default {
         position.coords.latitude
       ];
       this.currentPosition = fromLonLat(positionLonLat);
-      this.map.getView().setCenter(this.currentPosition);
+      this.map.getView().setCenter(fromLonLat(positionLonLat));
       if (!this.circle) {
-        this.circle = new Circle(this.currentPosition, 250);
+        this.circle = new Circle(this.currentPosition, 55);
         const layer = new VectorLayer({
           source: new VectorSource({
             projection: "EPSG:4326",
@@ -82,9 +85,21 @@ export default {
             })
           ]
         });
+        this.startingPoint = new Point(fromLonLat(positionLonLat));
         this.map.addLayer(layer);
         return;
       }
+      const currentPoint = new Point(fromLonLat(positionLonLat));
+
+      const layerLine = new VectorLayer({
+        source: new VectorSource({
+          projection: "EPSG:4326",
+          features: [
+            new Feature(new LineString([this.startingPoint, currentPoint]))
+          ]
+        })
+      });
+      this.map.addLayer(layerLine);
       this.circle.setCenter(this.currentPosition);
     },
     failurePosition: function(err) {
@@ -102,7 +117,7 @@ export default {
   height: 100%;
 }
 #map {
-  width: 400px;
-  height: 250px;
+  width: 1200px;
+  height: 800px;
 }
 </style>
