@@ -13,7 +13,6 @@ import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import Circle from "ol/geom/Circle";
-import Point from "ol/geom/Point";
 import LineString from "ol/geom/LineString";
 import Feature from "ol/Feature";
 import Style from "ol/style/Style";
@@ -26,7 +25,9 @@ export default {
     zoom: 16,
     currentPosition: [0, 0],
     startingPoint: null,
-    map: null
+    map: null,
+    lineString: null,
+    circle: null
   }),
   methods: {
     initMap() {
@@ -44,19 +45,6 @@ export default {
       });
     },
     trackPosition() {
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          this.successPosition,
-          this.failurePosition,
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        alert(`Browser doesn't support Geolocation`);
-      }
       this.initMap();
     },
     successPosition(position) {
@@ -65,45 +53,82 @@ export default {
         position.coords.latitude
       ];
       this.currentPosition = fromLonLat(positionLonLat);
-      this.map.getView().setCenter(fromLonLat(positionLonLat));
+      this.map.getView().setCenter(this.currentPosition);
       if (!this.circle) {
-        this.circle = new Circle(this.currentPosition, 55);
-        const layer = new VectorLayer({
-          source: new VectorSource({
-            projection: "EPSG:4326",
-            features: [new Feature(this.circle)]
-          }),
-          style: [
-            new Style({
-              stroke: new Stroke({
-                color: "blue",
-                width: 1
-              }),
-              fill: new Fill({
-                color: "rgba(0, 0, 255, 0.9)"
-              })
-            })
-          ]
-        });
-        this.startingPoint = new Point(fromLonLat(positionLonLat));
-        this.map.addLayer(layer);
+        this.circle = this.createPoint(positionLonLat);
+        this.circle.setCenter(this.currentPosition);
         return;
       }
-      const currentPoint = new Point(fromLonLat(positionLonLat));
-
-      const layerLine = new VectorLayer({
-        source: new VectorSource({
-          projection: "EPSG:4326",
-          features: [
-            new Feature(new LineString([this.startingPoint, currentPoint]))
-          ]
-        })
-      });
-      this.map.addLayer(layerLine);
-      this.circle.setCenter(this.currentPosition);
+      // this.circle.setCenter(this.currentPosition);
+      debugger;
+      if (!this.lineString) {
+        this.createLineString(this.startingPoint, this.currentPosition);
+        return;
+      }
+      this.lineString.appendCoordinate(this.currentPosition);
     },
     failurePosition: function(err) {
       alert("Error Code: " + err.code + " Error Message: " + err.message);
+    },
+    createPoint(pos) {
+      this.circle = new Circle(this.currentPosition, 55);
+      const layer = new VectorLayer({
+        source: new VectorSource({
+          projection: "EPSG:4326",
+          features: [new Feature(this.circle)]
+        }),
+        style: [
+          new Style({
+            stroke: new Stroke({
+              color: "blue",
+              width: 1
+            }),
+            fill: new Fill({
+              color: "rgba(0, 0, 255, 0.9)"
+            })
+          })
+        ]
+      });
+      this.startingPoint = fromLonLat(pos);
+      this.map.addLayer(layer);
+    },
+    createLineString(startingPoint, endPoint) {
+      this.lineString = new LineString([startingPoint, endPoint]);
+      const lineLayer = new VectorLayer({
+        source: new VectorSource({
+          projection: "EPSG:4326",
+          features: [new Feature(this.lineString)]
+        }),
+        style: [
+          new Style({
+            stroke: new Stroke({
+              color: "blue",
+              width: 1
+            }),
+            fill: new Fill({
+              color: "rgba(0, 0, 255, 0.9)"
+            })
+          })
+        ]
+      });
+      this.map.addLayer(lineLayer);
+    },
+    updateLineSection() {},
+    getGPSLocation() {
+      if (!navigator.geolocation) {
+        alert(`Browser doesn't support Geolocation`);
+        return;
+      }
+      const watchPositionConfig = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      };
+      navigator.geolocation.watchPosition(
+        this.successPosition,
+        this.failurePosition,
+        watchPositionConfig
+      );
     }
   },
   computed: {},
