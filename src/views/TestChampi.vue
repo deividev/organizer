@@ -47,20 +47,20 @@ export default {
       });
     },
     trackPosition() {
-      //      this.getGPSLocation();
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          this.successPosition,
-          this.failurePosition,
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        alert(`Browser doesn't support Geolocation`);
-      }
+      this.getGPSLocation();
+      // if (navigator.geolocation) {
+      //   navigator.geolocation.watchPosition(
+      //     this.successPosition,
+      //     this.failurePosition,
+      //     {
+      //       enableHighAccuracy: true,
+      //       timeout: 15000,
+      //       maximumAge: 0
+      //     }
+      //   );
+      // } else {
+      //   alert(`Browser doesn't support Geolocation`);
+      // }
       this.initMap();
     },
     successPosition(position) {
@@ -72,7 +72,6 @@ export default {
       this.currentPosition = fromLonLat(positionLonLat);
       if (!this.circle) {
         this.createPoint(positionLonLat);
-        // this.circle.setCenter(fromLonLat(positionLonLat));
         return;
       }
       this.circle.setCenter(fromLonLat(positionLonLat));
@@ -80,7 +79,7 @@ export default {
         this.createLineString(this.startingPoint, fromLonLat(positionLonLat));
         return;
       }
-      this.lineString.appendCoordinate(this.currentPosition);
+      this.updateLinePoints();
       this.longitud = this.formatLineStringLength(this.lineString);
     },
     failurePosition: function(err) {
@@ -139,21 +138,23 @@ export default {
       });
       this.map.addLayer(lineLayer);
     },
-    updateLineSection() {},
+    updateLinePoints() {
+      this.lineString.appendCoordinate(this.currentPosition);
+    },
     getGPSLocation() {
       if (!navigator.geolocation) {
         alert(`Browser doesn't support Geolocation`);
         return;
       }
-      const watchPositionConfig = {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-      };
+
       navigator.geolocation.watchPosition(
         this.successPosition,
         this.failurePosition,
-        watchPositionConfig
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
       );
     }
   },
