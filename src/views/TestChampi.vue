@@ -1,8 +1,11 @@
 <template>
   <div>
-    <div id="tracking">{{currentPosition}}</div>
-    <h1 style="float: left;">{{longitud}}</h1>
     <div id="map"></div>
+    <div>
+      <h1>{{longitud}}</h1>
+      <button class="btn">Start</button>
+      <button class="btn">Finish</button>
+    </div>
   </div>
 </template>
 <script>
@@ -165,11 +168,20 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+
+.btn {
+  margin: 5px;
+  padding: 8px;
+  background-color: rgb(87, 171, 255);
+  border: 1px solid #444444;
+  border-radius: 2px;
+  color: #fff;
+}
 #tracking {
   height: 100%;
 }
 #map {
-  width: 400px;
-  height: 200px;
+  width: 100vw;
+  height: 60vh;
 }
 </style>
