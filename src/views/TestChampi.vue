@@ -45,6 +45,20 @@ export default {
       });
     },
     trackPosition() {
+      //      this.getGPSLocation();
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          this.successPosition,
+          this.failurePosition,
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        alert(`Browser doesn't support Geolocation`);
+      }
       this.initMap();
     },
     successPosition(position) {
@@ -52,17 +66,16 @@ export default {
         position.coords.longitude,
         position.coords.latitude
       ];
-      this.currentPosition = fromLonLat(positionLonLat);
       this.map.getView().setCenter(this.currentPosition);
+      this.currentPosition = fromLonLat(positionLonLat);
       if (!this.circle) {
-        this.circle = this.createPoint(positionLonLat);
-        this.circle.setCenter(this.currentPosition);
+        this.createPoint(positionLonLat);
+        this.circle.setCenter(fromLonLat(positionLonLat));
         return;
       }
       // this.circle.setCenter(this.currentPosition);
-      debugger;
       if (!this.lineString) {
-        this.createLineString(this.startingPoint, this.currentPosition);
+        this.createLineString(this.startingPoint, fromLonLat(positionLonLat));
         return;
       }
       this.lineString.appendCoordinate(this.currentPosition);
