@@ -5,7 +5,7 @@
       :currentPosition="currentPosition"
       @changeLongitud="updateRouteLong"
     ></Map>
-    <controls :lontigud="longitud" @startRoute="startRoute"></controls>
+    <controls :longitud="longitud" @startRoute="startRoute"></controls>
   </div>
 </template>
 <script>
@@ -55,6 +55,7 @@ export default {
       );
     },
     updateRouteLong(ev) {
+      debugger
       this.longitud = ev;
     }
   },

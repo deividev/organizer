@@ -9,12 +9,12 @@ import OSM from "ol/source/OSM";
 import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
-import Circle from "ol/geom/Circle";
 import LineString from "ol/geom/LineString";
 import Feature from "ol/Feature";
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
+import mapUtils from "@/utils/mapUtils.js"
 
 export default {
   components: {},
@@ -22,7 +22,7 @@ export default {
     zoom: 16,
     map: null,
     lineString: null,
-    circle: null,
+    layerCircle: null,
     longitud: 0,
     startingPoint: null
   }),
@@ -55,10 +55,16 @@ export default {
       });
     },
     updatePosition(position) {
+      debugger
       this.map.getView().setCenter(fromLonLat(position));
-      if (!this.circle) {
-        this.createPoint(position);
+      if (!this.layerCircle) {
+        debugger
+        const {layer , circle} = mapUtils.createPoint(position);
+        this.circle = circle;
+        this.layerCircle = layer;
+        this.map.addLayer(this.layerCircle);
       }
+      debugger
       this.circle.setCenter(fromLonLat(position));
       if (this.routeStarted) {
         if (!this.lineString) {
@@ -66,13 +72,14 @@ export default {
           this.createLineString(this.startingPoint, fromLonLat(position));
           return;
         }
+        debugger
         this.updateLinePoints(fromLonLat(position));
         this.longitud = this.formatLineStringLength(this.lineString);
         this.$emit("changeLongitud", this.longitud);
       }
     },
-    createPoint(pointCenter) {
-      this.circle = new Circle(fromLonLat(pointCenter), 1);
+    /*createPoint(pointCenter) {
+      this.circle = new Circle(fromLonLat(pointCenter), 5);
       const layer = new VectorLayer({
         source: new VectorSource({
           projection: "EPSG:4326",
@@ -91,7 +98,7 @@ export default {
         ]
       });
       this.map.addLayer(layer);
-    },
+    },*/
     formatLineStringLength(line) {
       let length = line.getLength(line);
       let output;
