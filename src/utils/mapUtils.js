@@ -11,7 +11,6 @@ import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 
 const createPoint = (pointCenter) => {
-  debugger
   const circle = new Circle(fromLonLat(pointCenter), 5);
   const layer = new VectorLayer({
     source: new VectorSource({
