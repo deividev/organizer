@@ -14,7 +14,7 @@ import Feature from "ol/Feature";
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
-import mapUtils from "@/utils/mapUtils.js"
+import mapUtils from "@/utils/mapUtils.js";
 
 export default {
   components: {},
@@ -24,20 +24,20 @@ export default {
     lineString: null,
     layerCircle: null,
     longitud: 0,
-    startingPoint: null
+    startingPoint: null,
   }),
   props: {
     currentPosition: {
-      type: Array
+      type: Array,
     },
     routeStarted: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   watch: {
     currentPosition(newVal) {
       this.updatePosition(newVal);
-    }
+    },
   },
   methods: {
     initMap() {
@@ -45,26 +45,23 @@ export default {
         target: "map",
         layers: [
           new TileLayer({
-            source: new OSM()
-          })
+            source: new OSM(),
+          }),
         ],
         view: new View({
           center: this.currentPosition,
-          zoom: 12
-        })
+          zoom: 12,
+        }),
       });
     },
     updatePosition(position) {
-      debugger
       this.map.getView().setCenter(fromLonLat(position));
       if (!this.layerCircle) {
-        debugger
-        const {layer , circle} = mapUtils.createPoint(position);
+        const { layer, circle } = mapUtils.createPoint(position);
         this.circle = circle;
         this.layerCircle = layer;
         this.map.addLayer(this.layerCircle);
       }
-      debugger
       this.circle.setCenter(fromLonLat(position));
       if (this.routeStarted) {
         if (!this.lineString) {
@@ -72,33 +69,11 @@ export default {
           this.createLineString(this.startingPoint, fromLonLat(position));
           return;
         }
-        debugger
         this.updateLinePoints(fromLonLat(position));
         this.longitud = this.formatLineStringLength(this.lineString);
         this.$emit("changeLongitud", this.longitud);
       }
     },
-    /*createPoint(pointCenter) {
-      this.circle = new Circle(fromLonLat(pointCenter), 5);
-      const layer = new VectorLayer({
-        source: new VectorSource({
-          projection: "EPSG:4326",
-          features: [new Feature(this.circle)]
-        }),
-        style: [
-          new Style({
-            stroke: new Stroke({
-              color: "blue",
-              width: 1
-            }),
-            fill: new Fill({
-              color: "rgba(0, 0, 255, 0.9)"
-            })
-          })
-        ]
-      });
-      this.map.addLayer(layer);
-    },*/
     formatLineStringLength(line) {
       let length = line.getLength(line);
       let output;
@@ -114,30 +89,30 @@ export default {
       const lineLayer = new VectorLayer({
         source: new VectorSource({
           projection: "EPSG:4326",
-          features: [new Feature(this.lineString)]
+          features: [new Feature(this.lineString)],
         }),
         style: [
           new Style({
             stroke: new Stroke({
               color: "blue",
-              width: 1
+              width: 1,
             }),
             fill: new Fill({
-              color: "rgba(0, 0, 255, 0.9)"
-            })
-          })
-        ]
+              color: "rgba(0, 0, 255, 0.9)",
+            }),
+          }),
+        ],
       });
       this.map.addLayer(lineLayer);
     },
     updateLinePoints(position) {
       this.lineString.appendCoordinate(position);
-    }
+    },
   },
   computed: {},
   mounted() {
     this.map = this.initMap();
-  }
+  },
 };
 </script>
 <style scoped lang="scss">

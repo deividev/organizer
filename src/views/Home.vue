@@ -21,7 +21,7 @@ export default {
     lineString: null,
     circle: null,
     longitud: 0,
-    routeStarted: false
+    routeStarted: false,
   }),
   methods: {
     startRoute() {
@@ -30,7 +30,7 @@ export default {
     successPosition(position) {
       const positionLonLat = [
         position.coords.longitude,
-        position.coords.latitude
+        position.coords.latitude,
       ];
       this.currentPosition = positionLonLat;
     },
@@ -50,19 +50,18 @@ export default {
         {
           enableHighAccuracy: true,
           timeout: 15000,
-          maximumAge: 0
+          maximumAge: 0,
         }
       );
     },
     updateRouteLong(ev) {
-      debugger
       this.longitud = ev;
-    }
+    },
   },
   computed: {},
   mounted() {
     this.watchGPSLocation();
-  }
+  },
 };
 </script>
 <style lang="scss">
