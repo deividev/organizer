@@ -58,16 +58,12 @@ export default {
     updatePosition(position) {
       this.map.getView().setCenter(fromLonLat(position));
       if (!this.layerCircle) {
-        Feature/design
         const {layer , circle} = mapUtils.createPoint(position);
-
         this.circle = circle;
         this.layerCircle = layer;
         this.map.addLayer(this.layerCircle);
       }
-      Feature/design
       this.circle.setCoordinates(fromLonLat(position));
-
       if (this.routeStarted) {
         if (!this.lineString) {
           this.startingPoint = fromLonLat(position);
