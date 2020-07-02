@@ -3,15 +3,15 @@ import "ol/ol.css";
 import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
-import Circle from "ol/geom/Circle";
+// import Circle from "ol/geom/Circle";
 
 import Feature from "ol/Feature";
-import Style from "ol/style/Style";
-import Stroke from "ol/style/Stroke";
-import Fill from "ol/style/Fill";
+import { Icon, Style } from 'ol/style.js'
+import Point from "ol/geom/Point";
+// import iconCursor from "@/assets/cursor.svg"
 
 const createPoint = (pointCenter) => {
-  const circle = new Circle(fromLonLat(pointCenter), 5);
+  const circle = new Point(fromLonLat(pointCenter));
   const layer = new VectorLayer({
     source: new VectorSource({
       projection: "EPSG:4326",
@@ -19,14 +19,13 @@ const createPoint = (pointCenter) => {
     }),
     style: [
       new Style({
-        stroke: new Stroke({
-          color: "blue",
-          width: 1
-        }),
-        fill: new Fill({
-          color: "rgba(0, 0, 255, 0.9)"
-        })
-      })
+        image: new Icon( ({
+            anchor: [0.5, 46],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            src: 'https://img.icons8.com/fluent/48/000000/google-maps-new.png'
+        }))
+    })
     ]
   });
   return {layer, circle};
