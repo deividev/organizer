@@ -11,7 +11,7 @@ import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import LineString from "ol/geom/LineString";
 import Feature from "ol/Feature";
-import Style from "ol/style/Style";
+import { Style } from 'ol/style.js'
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 import mapUtils from "@/utils/mapUtils.js";
@@ -23,6 +23,7 @@ export default {
     map: null,
     lineString: null,
     layerCircle: null,
+    layerIcon: null,
     longitud: 0,
     startingPoint: null,
   }),
@@ -57,12 +58,16 @@ export default {
     updatePosition(position) {
       this.map.getView().setCenter(fromLonLat(position));
       if (!this.layerCircle) {
-        const { layer, circle } = mapUtils.createPoint(position);
+        Feature/design
+        const {layer , circle} = mapUtils.createPoint(position);
+
         this.circle = circle;
         this.layerCircle = layer;
         this.map.addLayer(this.layerCircle);
       }
-      this.circle.setCenter(fromLonLat(position));
+      Feature/design
+      this.circle.setCoordinates(fromLonLat(position));
+
       if (this.routeStarted) {
         if (!this.lineString) {
           this.startingPoint = fromLonLat(position);
