@@ -55,16 +55,13 @@ export default {
       });
     },
     updatePosition(position) {
-      debugger
       this.map.getView().setCenter(fromLonLat(position));
       if (!this.layerCircle) {
-        debugger
         const {layer , circle} = mapUtils.createPoint(position);
         this.circle = circle;
         this.layerCircle = layer;
         this.map.addLayer(this.layerCircle);
       }
-      debugger
       this.circle.setCenter(fromLonLat(position));
       if (this.routeStarted) {
         if (!this.lineString) {
@@ -72,7 +69,6 @@ export default {
           this.createLineString(this.startingPoint, fromLonLat(position));
           return;
         }
-        debugger
         this.updateLinePoints(fromLonLat(position));
         this.longitud = this.formatLineStringLength(this.lineString);
         this.$emit("changeLongitud", this.longitud);

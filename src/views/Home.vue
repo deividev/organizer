@@ -55,7 +55,6 @@ export default {
       );
     },
     updateRouteLong(ev) {
-      debugger
       this.longitud = ev;
     }
   },
