@@ -7,7 +7,7 @@
       </div>
       <div class="container__data">
         <p class="container__info--title">Tiempo</p>
-        <p class="container__info--data">00:30:02</p>
+        <p class="container__info--data">{{getHour}}</p>
       </div>
     </div>
     <div class="container__info">
@@ -32,14 +32,47 @@
 <script>
 export default {
   name: "Controls",
+  data: () => ({
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  }),
   props: {
     longitud: {
       required: false
     }
   },
+  created() {},
   methods: {
     startRoute() {
       this.$emit("startRoute");
+      this.startCounter();
+    },
+    startCounter() {
+      setInterval(() => {
+        this.updateTime();
+      }, 1000);
+    },
+    updateTime() {
+      this.seconds++;
+      if (this.minutes > 59) {
+        this.hours++;
+        this.minutes = 0;
+        this.seconds = 0;
+      }
+      if (this.seconds > 59) {
+        this.minutes++;
+        this.seconds = 0;
+      }
+    }
+  },
+  computed: {
+    getHour() {
+      const seconds = this.seconds > 9 ? this.seconds : `0${this.seconds}`;
+      const minutes = this.minutes > 9 ? this.minutes : `0${this.minutes}`;
+      const hours = this.hours > 9 ? this.hours : `0${this.hours}`;
+
+      return `${hours} : ${minutes} : ${seconds}`;
     }
   }
 };
