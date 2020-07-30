@@ -89,7 +89,7 @@ export default {
   font-weight: 700;
   outline: none;
   cursor: pointer;
-  transition: all 1s;
+  transition: all 0.3s;
 }
 
 .btn:hover {
